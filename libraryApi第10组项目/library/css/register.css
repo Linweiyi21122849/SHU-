@@ -1,0 +1,78 @@
+.login{
+    width: 400px;
+    /* height: 530px; */
+    border: 1.5px solid white;
+    border-radius: 15px;
+    margin: 8% auto;
+    /* box-shadow: 0 0 15px 3px rgb(2, 179, 255), inset 0 0 15px 3px rgb(2, 179, 255);
+    background: radial-gradient(rgb(235, 255, 255),60%, rgb(8, 250, 250) 69%); */
+    box-shadow: 0 0 15px 3px rgb(158, 1, 1), inset 0 0 20px 3px rgb(182, 2, 2);
+    background: radial-gradient(rgb(255, 211, 213),60%, rgb(252, 58, 64) 75%);
+    /* clear: both; */
+}
+
+.login-title{
+    margin-top: 48px;
+    text-align: center;
+}
+
+.login-wrap{
+    width: 100%;
+    text-align: center;
+    /* border: 1px solid; */
+}
+
+.login-wrap a{
+    text-decoration: none;
+}
+
+.login-input{
+    width: 320px;
+    padding: 10px;
+    border: 1px solid;
+    border-radius: 5px;
+    margin-top: 20px;
+    font-size: 15px;
+}
+
+#code{
+    width: 50%;
+    padding: 10px;
+    border: 1px solid;
+    border-radius: 5px;
+    margin: 20px 25px 0px 30px;
+    font-size: 15px;
+}
+
+#btn-code{
+    width: 94px;
+    height: 38px;
+    text-align: center;
+    font-family:sans-serif;
+}
+
+.btn{
+    height: 50px;
+    width: 150px;
+    display: inline-block;
+    /* float: left; */
+    /* border: 1px solid; */
+    font-size: 16px;
+    border: 0px solid;
+    line-height: 50px;
+    border-radius: 5px;
+    color: white;
+    text-align: center;
+    background-color: rgb(77, 139, 200);
+    margin: 30px 0px 48px 125px;
+    cursor: pointer;
+    /* background-color: rgb(246, 6, 6); */
+}
+
+.error{
+    font-size: 15px;
+    color: red;
+    margin-left: 30px;
+    margin-top: 10px;
+}
+

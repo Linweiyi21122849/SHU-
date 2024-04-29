@@ -1,0 +1,922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的图书馆 - 管理员界面</title>
+    <link rel="icon" href="images/logo.png">
+    <link rel="stylesheet" href="css/admin.css">
+    <script src="vue.global.js"></script>
+</head>
+
+<body id="body" background="images/background.png" style="background-color: rgb(0, 0, 0);">
+    <div class="all" style="width: 100%; height: 100%;">
+        <div class="frame_header">
+            <!-- <img src="images/frame_header.png" alt="" class="header_img"> -->
+            <div class="header_left" style="background-image: url(images/header_logo.png);"></div>
+            <ul class="func">
+                <li>
+                    <div class="name_wrap" @click.stop="clickFunc">
+                        <span id="uname">欢迎您，{{uname}}</span>
+                        <img src="images/arrow.png" class="img_arrow" style="margin-bottom: 6px;">
+                    </div>
+                    <ul class="func_component" v-if="func_list_show">
+                        <li><div @click="openInfo">个人信息</div></li>
+                        <li><div @click="logout">退出登录</div></li>
+                    </ul>
+                </li>
+            </ul>
+            <ul class="func2">
+                <li id="catelog" @click="showCatelogs"><div class="light" v-show="catelog_show"></div>书目管理</li>
+                <li id="info" @click="showInfos"><div class="light" v-show="info_show"></div>图书管理</li>
+                <li id="send" @click="showSends"><div class="light" v-show="send_show"></div>借书管理</li>
+                <li id="rt" @click="showReturns"><div class="light" v-show="return_show"></div>还书管理</li>
+            </ul>
+        </div>
+        <div class="frame_body" style="position: relative; z-index: 0;">
+            <img src="images/table_wrap4.png" alt="" class="table_img">
+            <div class="table_wrap">
+                <div>
+                    <div class="search_book">
+                        <input type="search" id="search_input" :placeholder="search_info" v-model="book_name">
+                        <input type="button" id="search_btn" value="检索" @click="search_click">
+                    </div>
+                    <input type="button" value="添加" id="add_btn" v-if="catelog_show || info_show" @click="add_cate_btn">
+                </div>
+                
+                <table class="data_table" cellspacing="0" align="center" v-show="catelog_show">
+                    <colgroup>
+                        <col width="150px"><col width="150px"><col width="150px"><col width="150px">
+                        <col width="150px"><col width="100px"><col width="100px"><col width="50px"><col width="50px">
+                    </colgroup>
+                    <tr>
+                        <th>书名</th><th>作者</th><th>出版商</th><th>ISBN号</th><th>出版年月</th><th>册数</th><th>经办人</th><th></th><th></th>
+                    </tr>
+                    <tr v-for="catelog in catelogs" :key="catelog_update" v-if="catelog_load">
+                        <td style="max-width: 150px;">{{catelog.name}}</td>
+                        <td style="max-width: 150px;">{{catelog.author}}</td>
+                        <td style="max-width: 150px;">{{catelog.publisher}}</td>
+                        <td style="max-width: 150px;">{{catelog.isbn}}</td>
+                        <td style="max-width: 150px;">{{catelog.time}}</td>
+                        <td style="max-width: 100px;">{{catelog.num}}</td>
+                        <td style="max-width: 100px;">{{catelog.transactor}}</td>
+                        <!-- <td v-if="false"><div>{{catelog.reserved}}</div></td> -->
+                        <!-- <td v-show="catelog.reserved == '1'"><div>已预约</div></td> -->
+                        <td><input type="button" value="修改" class="btn" @click="mod_cate_btn(catelog)"></td>
+                        <td><input type="button" value="删除" class="btn" @click="del_mod_cate(catelog)"></td>
+                    </tr>
+                </table>
+                <table class="info_table" cellspacing="0" align="center" v-show="info_show">
+                    <colgroup>
+                        <col width="158px"><col width="158px"><col width="158px"><col width="158px">
+                        <col width="158px"><col width="158px"><col width="50px"><col width="50px">
+                    </colgroup>
+                    <tr>
+                        <th>ID</th><th>书名</th><th>ISBN号</th><th>存放位置</th><th>当前状态</th><th>经办人</th><th></th><th></th>
+                    </tr>
+                    <tr v-for="info in infos" :key="info_update" v-if="info_load">
+                        <td style="max-width: 150px;">{{info.ID}}</td>
+                        <td style="max-width: 150px;">{{info.name}}</td>
+                        <td style="max-width: 150px;">{{info.isbn}}</td>
+                        <td style="max-width: 150px;">{{info.place}}</td>
+                        <td style="max-width: 150px;">{{info.state}}</td>
+                        <td style="max-width: 150px;">{{info.transactor}}</td>
+                        <!-- <td v-if="false"><div>{{catelog.reserved}}</div></td> -->
+                        <!-- <td v-show="catelog.reserved == '1'"><div>已预约</div></td> -->
+                        <td><input type="button" value="修改" class="btn" @click="mod_info_btn(info)"></td>
+                        <td><input type="button" value="删除" class="btn" @click="del_mod_info(info)"></td>
+                    </tr>
+                </table>
+                <table class="send_table" cellspacing="0" align="center" v-show="send_show">
+                    <colgroup>
+                        <col width="155px"><col width="155px"><col width="155px"><col width="155px">
+                        <col width="155px"><col width="100px"><col width="100px"><col width="80px">
+                    </colgroup>
+                    <tr>
+                        <th>书名</th><th>作者</th><th>出版商</th><th>ISBN号</th><th>出版年月</th><th>册数</th><th>经办人</th><th></th>
+                    </tr>
+                    <tr v-for="send in sends" v-if="send_load">
+                        <td style="max-width: 155px;">{{send.name}}</td>
+                        <td style="max-width: 155px;">{{send.author}}</td>
+                        <td style="max-width: 155px;">{{send.publisher}}</td>
+                        <td style="max-width: 155px;">{{send.isbn}}</td>
+                        <td style="max-width: 155px;">{{send.time}}</td>
+                        <td style="max-width: 100px;">{{send.num}}</td>
+                        <td style="max-width: 100px;">{{send.transactor}}</td>
+                        <td><input type="button" value="借书" class="btn" @click="send_btn(send)" v-if="send.num != 0" style="width: 50px; height: 25px;"></td>
+                    </tr>
+                </table>
+                <table class="return_table" cellspacing="0" align="center" v-show="return_show">
+                    <colgroup>
+                        <col width="155px"><col width="155px"><col width="155px"><col width="155px">
+                        <col width="155px"><col width="100px"><col width="100px"><col width="80px">
+                    </colgroup>
+                    <tr>
+                        <th>读者ID</th><th>书名</th><th>ISBN号</th><th>借书日期</th><th>借书期限</th><th>经办人</th><th>罚金</th><th></th>
+                    </tr>
+                    <tr v-for="rt in returns" v-if="return_load">
+                        <td style="max-width: 155px;">{{rt.ID}}</td>
+                        <td style="max-width: 155px;">{{rt.name}}</td>
+                        <td style="max-width: 155px;">{{rt.isbn}}</td>
+                        <td style="max-width: 155px;">{{rt.time}}</td>
+                        <td style="max-width: 155px;">{{rt.ddl}}</td>
+                        <td style="max-width: 100px;">{{rt.transactor}}</td>
+                        <td style="max-width: 100px;">{{rt.penalty}}</td>
+                        <td v-if="false" style="max-width: 180px;">{{rt.returned}}</td>
+                        <td v-show="rt.returned == 1"><div>已归还</div></td>
+                        <td>
+                            <input type="button" value="还书" class="btn" @click="return_btn(rt)" v-if="rt.returned == 0" style="width: 50px; height: 25px;">
+                        </td>
+                    </tr>
+                </table>
+                <div class="page_wrap">
+                    <ul>
+                        <li style="float: left;" @click="pageDown(1)"><</li>
+                        <li style="margin-left: 45px; font-size: 14px;">{{page_num}}</li>
+                        <li style="float: right;" @click="pageDown(-1)">></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="info_wrap" id="info_id">
+            <div class="info_close_wrap">
+                <div class="info_close" @click="closeInfo">×</div>
+            </div>
+            <h2 style="text-align: center; margin-bottom: 40px;">个人信息</h2>
+            <div class="info_row">
+                <div class="info_key">我的ID</div>
+                <input type="search" class="info_value" id="ID" v-model="ID" readonly="readonly">
+            </div>
+            <div class="info_row">
+                <div class="info_key">我的名字</div>
+                <input type="search" class="info_value" id="name" v-model="uname" readonly="readonly">
+            </div>
+        </div>
+        <form id="mod_cate_form" method="post">
+            <div class="cate_modify_wrap" v-show="cate_modify_show">
+                <h2 style="text-align: center; margin: 45px 0px 40px 0px;">{{modify_title}}</h2>
+                <div class="info_row" v-if="is_mod_cate">  <!-- 是否是修改、添加书目 -->
+                    <div class="info_key">书名</div>
+                    <input type="search" class="info_value" id="bname" name="name">
+                </div>
+                <div class="info_row" v-if="is_mod_cate">
+                    <div class="info_key">作者</div>
+                    <input type="search" class="info_value" id="ID" name="author">
+                </div>
+                <div class="info_row" v-if="is_mod_cate">
+                    <div class="info_key">出版商</div>
+                    <input type="search" class="info_value" id="ID" name="publisher">
+                </div>
+                <div class="info_row" v-if="is_mod_cate">
+                    <div class="info_key">ISBN号</div>
+                    <input type="search" class="info_value" id="ID" name="isbn">
+                </div>
+                <div class="info_row" v-if="is_mod_cate">
+                    <div class="info_key">出版年月</div>
+                    <input type="search" class="info_value" id="name" name="time">
+                </div>
+                <!-- 以下为添加图书 -->
+                <input type="hidden" class="info_value" id="name" name="ID" v-if="!is_mod_cate">     
+                <input type="hidden" class="info_value" id="name" name="name" v-if="!is_mod_cate">        
+                <div class="info_row" v-if="!is_mod_cate">
+                    <div class="info_key">ISBN号</div>
+                    <input type="search" class="info_value" id="name" name="isbn">
+                </div>
+                <div class="info_row" v-if="!is_mod_cate">
+                    <div class="info_key">存放位置</div>
+                    <select name="place" class="info_value" id="info_select" style="cursor: pointer;">
+                        <option value="图书流通室">图书流通室</option>
+                        <option value="图书阅览室">图书阅览室</option>
+                    </select>
+                </div>
+                <div class="info_row" v-if="!is_add">
+                    <div class="info_key">经办人</div>
+                    <input type="search" class="info_value" id="name" name="transactor">
+                </div>
+                <div class="error" v-if="has_error">
+                    {{error_msg}}
+                </div>
+                <div class="info_btn_wrap">
+                    <input type="button" value="保存" class="info_btn" @click="save_mod_cate">
+                    <input type="button" value="取消" class="info_btn" id="info_cancel" style="margin-left: 60px;" @click="close(1)"> 
+                </div>
+            </div>
+        </form>
+        <form id="send_form" method="post">
+            <div class="cate_modify_wrap" id="send_book_id" v-show="send_book_show">
+                <h2 style="text-align: center; margin: 45px 0px 40px 0px;">借书登记</h2>
+                <input type="hidden" class="info_value" id="bname" name="name">
+                <input type="hidden" class="info_value" id="bname" name="isbn">
+                <div class="info_row">      
+                    <div class="info_key">读者ID</div>
+                    <input type="search" class="info_value" id="bname" name="ID">
+                </div>
+                <div class="error" v-if="has_error">
+                    {{error_msg}}
+                </div>
+                <div class="info_btn_wrap">
+                    <input type="button" value="保存" class="info_btn" @click="send_save_btn">
+                    <input type="button" value="取消" class="info_btn" id="info_cancel" style="margin-left: 60px;" @click="close(2)"> 
+                </div>
+            </div>
+        </form>
+        <div class="hint_wrap" v-if="hint_show">
+            <div class="hint_word">{{hint_msg}}</div>
+            <input type="button" class="hint_btn" value="确认" @click="closeHint">
+        </div>
+        <div class="hint_wrap" v-if="pay_hint_show">
+            <div class="hint_word">{{hint_msg}}</div>
+            <div class="pay_btn_wrap">
+                <input type="button" class="pay_hint_btn" value="已支付" @click="hasPay">
+                <input type="button" class="pay_hint_btn" value="取消" style="margin-left: 40px;" @click="closeHint">
+            </div>
+        </div>
+    </div>
+    <div class="mask" id="mask_id"></div>
+</body>
+
+<script>
+    const { createApp, ref } = Vue
+    // const dayjs = require('dayjs')
+
+    var ip = "http://127.0.0.1:4444"
+    var uname= ref("123"), ID=ref(''), post
+
+    createApp({
+        data() {
+            var book_name=ref('')
+            var func_list_show=ref(0), modify_title=ref(''), is_modify=ref(false)
+
+            function closeInfo(){      //关闭个人信息
+                var info = document.getElementById('info_id')
+                info.style.display = "none"
+                showMask(0)
+            }
+
+            function openInfo(){       //开启个人信息
+                var info = document.getElementById('info_id')
+                info.style.display = "block"
+                showMask(1)
+            }
+
+            function clickFunc(){        //点击功能栏
+                func_list_show.value = 1
+                document.onclick=(e)=>{
+                    var ele = document.getElementsByClassName("func")
+                    if(ele[0].className != e.target.className){
+                        func_list_show.value = 0
+                        document.onclick=""
+                    }
+                }
+            }
+
+            var catelogs = [], infos = [], returns = [], sends = []
+            var catelog_load = ref(false), catelog_show = ref(true), catelog_update = ref(0), is_mod_cate=ref(true)
+            var info_load = ref(false), info_show = ref(false), info_update = ref(0)
+            var return_load = ref(false), return_show = ref(false), return_update = ref(0)
+            var send_load = ref(false), send_show = ref(false), send_update = ref(0)
+            var page_num=ref(1), catelog_num=ref(1), info_num=ref(1), return_num=ref(1), send_num=ref(1)
+            var catelog_search=ref(''), info_search=ref(''), return_search=ref(''), send_search=ref('')
+            var max_page_num=ref(3), max_catelog_num=ref(1), max_info_num=ref(2), max_return_num=ref(2), max_send_num=ref(3)
+
+            function search_click(){   //点击检索
+                page_num.value = 1
+                if(catelog_show.value) {
+                    catelog_num.value = 1
+                    catelog_search.value = book_name.value
+                    if(book_name.value == '') {
+                        getBookCatelogs()
+                        return
+                    }
+                }
+                else if(info_show.value) {
+                    info_num.value = 1
+                    info_search.value = book_name.value 
+                    if(book_name.value == '') {
+                        getBookInfos()
+                        return
+                    }
+                }
+                else if(return_show.value) {
+                    return_num.value = 1
+                    return_search.value = book_name.value 
+                    if(book_name.value == '') {
+                        getReturns()
+                        return
+                    }
+                }
+                else if(send_show.value) {
+                    send_num.value = 1
+                    send_search.value = book_name.value
+                    if(book_name.value == '') {
+                        getSends()
+                        return
+                    }
+                }
+                search()
+            }
+
+            function search(){      //检索
+                var req
+                if(catelog_show.value) {
+                    req = "/searchAdminCatelog"
+                }
+                else if(info_show.value) {
+                    req = "/searchAdminInfo"                   
+                }
+                else if(send_show.value) {
+                    req = "/searchAdminSend"
+                }
+                else if(return_show.value) {
+                    req = "/searchAdminReturn"
+                }
+                fetch(ip + req, {
+                    method: "post",
+                    headers: {'content-type': 'application/json'},
+                    body: JSON.stringify({"name": book_name.value, "pageNum": page_num.value})
+                }).then(res=>res.json())
+                .then(res => {
+                    console.log(res)
+                    if(catelog_show.value){
+                        catelogs.splice(0, catelogs.length)
+                        max_catelog_num.value = res[0].max
+                        for(var i = 1; i< res.length;i++){
+                            catelogs.push(res[i])
+                        }
+                        updateInfo(catelog_load)
+                    }
+                    else if(info_show.value){
+                        max_info_num.value = res[0].max
+                        infos.splice(0, infos.length)
+                        for(var i = 1; i< res.length;i++){
+                            infos.push(res[i])
+                        }
+                        updateInfo(info_load)
+                    }
+                    else if(send_show.value){
+                        max_send_num.value = res[0].max
+                        sends.splice(0, sends.length)
+                        for(var i = 1; i< res.length;i++){
+                            sends.push(res[i])
+                        }
+                        updateInfo(send_load)
+                    }
+                    else if(return_show.value){
+                        max_return_num.value = res[0].max
+                        returns.splice(0, returns.length)
+                        for(var i = 1; i< res.length;i++){
+                            returns.push(res[i])
+                        }
+                        updateInfo(return_load)
+                    }
+                })
+            }
+
+            function getUserInfo(){         //保存管理员信息
+                ID.value = sessionStorage.getItem('ID')
+                console.log("ID: "+ID.value)
+                var req = "/adminInfo"
+                fetch(ip + req, {
+                    method: "post",
+                    headers: {'content-type': 'application/json'},
+                    body: JSON.stringify({"ID": ID.value})
+                }).then(res=>res.json())
+                .then(res => {
+                    console.log(res)
+                    ID.value = res.ID
+                    uname.value  = res.name
+                })
+            }
+
+            function updateInfo(load){    //更新表中信息
+                load.value = false
+                load.value = true
+            }
+
+            function getBookCatelogs(){         //渲染书目信息
+                var req = "/adminCatelogInfo"
+                fetch(ip + req,  {
+                    method: "post",
+                    headers: {'content-type': 'application/json'},
+                    body: JSON.stringify({"ID": ID.value, "pageNum": page_num.value})
+                }).then(res=>res.json())
+                .then(res => {
+                    console.log(res)
+                    max_catelog_num.value = res[0].max
+                    catelogs.splice(0, catelogs.length)
+                    for(var i = 1; i< res.length;i++){
+                        catelogs.push(res[i])
+                    }
+                    updateInfo(catelog_load)
+                })
+            }
+
+            function getBookInfos(){         //渲染图书信息
+                var req = "/adminDetail"
+                fetch(ip + req, {
+                    method: "post",
+                    headers: {'content-type': 'application/json'},
+                    body: JSON.stringify({"ID": ID.value, "pageNum": page_num.value})
+                }).then(res=>res.json())
+                .then(res => {
+                    console.log(res)
+                    max_info_num.value = res[0].max
+                    infos.splice(0, infos.length)
+                    for(var i = 1; i< res.length;i++){
+                        infos.push(res[i])
+                    }
+                    updateInfo(info_load)
+                })
+            }
+
+            function getReturns(){     //渲染还书信息
+                var req = "/adminReturnInfo"
+                fetch(ip + req,  {
+                    method: "post",
+                    headers: {'content-type': 'application/json'},
+                    body: JSON.stringify({"ID": ID.value, "pageNum": page_num.value})
+                }).then(res=>res.json())
+                .then(res => {
+                    console.log(res)
+                    max_return_num.value = res[0].max
+                    returns.splice(0, returns.length)
+                    for(var i = 1; i< res.length;i++){
+                        returns.push(res[i])
+                    }
+                    updateInfo(return_load)
+                    window.onload = ""
+                })
+            }
+
+            function getSends(){     //渲染借书信息
+                var req = "/adminSendInfo"
+                fetch(ip + req, {
+                    method: "post",
+                    headers: {'content-type': 'application/json'},
+                    body: JSON.stringify({"ID": ID.value, "pageNum": page_num.value})
+                }).then(res=>res.json())
+                .then(res => {
+                    console.log(res)
+                    max_send_num.value = res[0].max
+                    sends.splice(0, sends.length)
+                    for(var i = 1; i< res.length;i++){
+                        sends.push(res[i])
+                    }
+                    updateInfo(send_load)
+                    window.onload = ""
+                })
+            }
+
+            var search_info = ref("请输入书名")
+            getUserInfo();
+            
+            window.onload=()=>{
+                // while(ID.value == '');
+                console.log(ID.value)
+                getBookCatelogs()
+                getBookInfos()
+                getReturns()
+                getSends()
+            }
+
+            function showReturns(){    //显示还书信息
+                return_show.value = true
+                catelog_show.value = false
+                send_show.value = false
+                info_show.value = false
+                book_name.value = return_search.value
+                page_num.value = return_num.value
+                search_info.value = "请输入读者ID"
+                if(return_search.value != '') search()
+                else getReturns()
+            }
+
+            function showCatelogs(){    //显示书目信息
+                catelog_show.value = true
+                return_show.value = false
+                send_show.value = false
+                info_show.value = false
+                book_name.value = catelog_search.value
+                page_num.value = catelog_num.value
+                is_mod_cate.value = true
+                search_info.value = "请输入书名"
+                if(catelog_search.value != '') search()
+                else getBookCatelogs()
+            }
+
+            function showInfos(){    //显示图书信息
+                info_show.value = true
+                catelog_show.value = false
+                return_show.value = false
+                send_show.value = false
+                book_name.value = info_search.value
+                page_num.value = info_num.value
+                is_mod_cate.value = false
+                search_info.value = "请输入书名"
+                if(info_search.value != '') search()
+                else getBookInfos()
+            }
+
+            function showSends(){      //显示借书信息
+                send_show.value = true
+                catelog_show.value = false
+                return_show.value = false
+                info_show.value = false
+                book_name.value = send_search.value
+                page_num.value = send_num.value
+                search_info.value = "请输入书名"
+                if(send_search.value != '') search()
+                else getSends()
+            }
+
+            function pageDown(num){     //1-向前翻页; -1-向后翻页
+                if(catelog_show.value) {
+                    max_page_num.value = max_catelog_num.value
+                }
+                else if(info_show.value) {
+                    max_page_num.value = max_info_num.value
+                }
+                else if(return_show.value) {
+                    max_page_num.value = max_return_num.value
+                }
+                else if(send_show.value) {
+                    max_page_num.value = max_send_num.value
+                }
+                console.log(max_page_num.value)
+                if((page_num.value == 1 && num == 1) || (page_num.value == max_page_num.value && num == -1)) {
+                    showHint('没有更多了')
+                    return
+                }
+                page_num.value -= num
+                if(catelog_show.value) {
+                    if(catelog_search.value != '') search()
+                    else getBookCatelogs()
+                    catelog_num.value -= num
+                }
+                else if(info_show.value) {
+                    if(info_search.value != '') search()
+                    else getBookInfos()
+                    info_num.value -= num
+                }
+                else if(return_show.value) {
+                    if(return_search.value != '') search()
+                    else getReturns()
+                    return_num.value -= num
+                }
+                else if(send_show.value) {
+                    if(send_search.value != '') search()
+                    else getSends()
+                    send_num.value -= num
+                }
+            }
+
+            var hint_show = ref(false), hint_msg = ref(''), mask_show = ref(false), has_error=ref(false), error_msg=ref('')
+            var bname=ref(''), author=ref(''), publisher=ref(''), isbn=ref(''), time=ref(''), transactor=ref('')
+            var cate_modify_show=ref(false), modify_catelog=[], is_add=ref(true), old_isbn=ref('')
+
+            function add_cate_btn(){      //点击添加书目、图书
+                var wrap = document.getElementsByClassName('cate_modify_wrap')[0]
+                is_add.value = true
+                if(!is_mod_cate.value){
+                    modify_title.value = "添加图书信息"
+                    var form = document.getElementById("mod_cate_form")
+                    form[0].value = form[1].value = '0'
+                    cate_modify_show.value = true
+                    wrap.style.marginTop = "150px"
+                    showMask(1)
+                    return
+                }
+                modify_title.value = "添加书目信息"
+                var form = document.getElementById("mod_cate_form")
+                cate_modify_show.value = true
+                wrap.style.marginTop = "130px"
+                showMask(1)
+            }
+
+            function mod_cate_btn(cate){      //点击修改书目
+                modify_title.value = "修改书目信息"
+                is_add.value = false
+                var c = {}
+                Object.assign(c, cate)
+                console.log(c)
+                delete c['num'];
+                console.log(c)
+                old_isbn.value = c['isbn']
+                var form = document.getElementById("mod_cate_form")
+                var infos = ['name', 'author', 'publisher', 'isbn', 'time', 'transactor']
+                setTimeout(()=>{
+                    for(var i = 0; i < 6; i++){
+                        form[i].value = Object.values(c)[i]
+                    }
+                },10)
+                cate_modify_show.value = true
+                showMask(1)
+            }
+
+            function mod_info_btn(cate){      //点击修改图书
+                modify_title.value = "修改图书信息"
+                is_add.value = false
+                var c = {}
+                Object.assign(c, cate)
+                delete c['state'];
+                console.log(c)
+                var form = document.getElementById("mod_cate_form")
+                setTimeout(()=>{
+                    for(var i = 0; i < 5; i++){
+                        form[i].value = Object.values(c)[i]
+                    }
+                },10)
+                cate_modify_show.value = true
+                showMask(1)
+            }
+
+            function formToJson(form){   //表单转json
+                var data = {}
+                var fd = new FormData(form)
+                fd.forEach((val, key) =>{
+                    data[key] = val
+                })
+                return data
+            }
+
+            function removeError(ele){   //去除错误信息
+                ele.onfocus = ()=>{
+                    has_error.value = false;
+                    ele.style.border = "0px";
+                    ele.onfocus=""
+                }
+                cancel = document.getElementById("info_cancel")
+                cancel.onclick = ()=>{
+                    has_error.value = false;
+                    ele.style.border = "0px";
+                    cancel.onclick=""
+                }
+            }
+
+            function save_mod_cate(){     //保存
+                btn = document.getElementsByClassName('info_btn')[0]
+                btn.disabled = 'disabled'
+                if(!is_mod_cate.value){   //添加、修改图书
+                    var form = document.getElementById("mod_cate_form")
+                    var req = is_add.value ? "/addInfo" : "/modInfo"
+                    var fdata = formToJson(form);
+                    for(var i = 0; i < form.length; i++){
+                        var ele = form[i]
+                        if(ele.value == ''){
+                            error = ['ID',"书名","ISBN号",'位置',"经办人"]
+                            error_msg.value = error[i] + "不能为空"
+                            ele.style.border = "2px solid red"
+                            has_error.value = true;
+                            removeError(ele)
+                            btn.disabled = ''
+                            return
+                        }
+                    }   
+                    if(is_add.value) fdata['transactor'] = ID.value
+                    console.log(fdata)
+                    fetch(ip + req, {
+                        method: "post",
+                        headers: {'content-type': 'application/json'},
+                        body: JSON.stringify(fdata)
+                    }).then(res=>res.text())
+                    .then(res => {
+                        console.log(res)
+                        btn.disabled = ''
+                        if(res != '1'){
+                            error_msg.value = res  //返回错误信息
+                            has_error.value = true;
+                            document.onclick = ()=>{
+                                has_error.value = false;
+                                document.onclick=""
+                            }
+                        }
+                        else{
+                            if(info_search.value != '') search()
+                            else getBookInfos()
+                            close(1)
+                            form.reset()
+                        }
+                    })
+                }
+                else{                          //添加、修改书目
+                    var form = document.getElementById("mod_cate_form")
+                    var req = is_add.value ? "/addCatelog" : "/modCatelog"
+                    var fdata = formToJson(form);
+                    for(var i = 0; i < form.length; i++){
+                        var ele = form[i]
+                        if(ele.value == ''){
+                            error = ['书名',"作者","出版商","ISBN号","出版年月","经办人"]
+                            error_msg.value = error[i] + "不能为空"
+                            ele.style.border = "2px solid red"
+                            has_error.value = true;
+                            removeError(ele)
+                            btn.disabled = ''
+                            return
+                        }
+                    }
+                    if(!is_add.value) fdata['old_isbn'] = old_isbn.value
+                    if(is_add.value) fdata['transactor'] = ID.value
+                    console.log(fdata)
+                    fetch(ip + req, {
+                        method: "post",
+                        headers: {'content-type': 'application/json'},
+                        body: JSON.stringify(fdata)
+                    }).then(res=>res.text())
+                    .then(res => {
+                        console.log(res)
+                        btn.disabled = ''
+                        if(res != '1'){
+                            error_msg.value = res  //返回错误信息
+                            has_error.value = true;
+                            document.onclick = ()=>{
+                                has_error.value = false;
+                                document.onclick=""
+                            }
+                        }
+                        else{
+                            if(catelog_search.value != '') search()
+                            else getBookCatelogs()
+                            close(1)
+                            form.reset()
+                        }
+                    })
+                }
+            }
+
+            function del_mod_cate(cate){     //删除书目
+                var req = "/delCatelog"
+                fetch(ip + req, {
+                    method: "post",
+                    headers: {'content-type': 'application/json'},
+                    body: JSON.stringify(cate)
+                }).then(res =>{
+                    if(catelog_search.value != '') search()
+                    else getBookCatelogs()
+                })
+            }
+
+            function del_mod_info(cate){     //删除图书
+                var req = "/delInfo"
+                fetch(ip + req, {
+                    method: "post",
+                    headers: {'content-type': 'application/json'},
+                    body: JSON.stringify(cate)
+                }).then(res=>{
+                    if(info_search.value != '') search()
+                    else getBookInfos()
+                })
+            }
+
+            function close(id){        //关闭窗口
+                if(id == 1) {
+                    cate_modify_show.value = false
+                    var form = document.getElementById("mod_cate_form")
+                    form.reset()
+                }
+                else if(id == 2) {
+                    send_book_show.value = false
+                    var form = document.getElementById("send_form")
+                    form.reset()
+                }
+                showMask(0)
+            }
+
+            var send_book_show=ref(false)
+
+            function send_save_btn(){    //借书
+                btn = document.getElementsByClassName('info_btn')[2]
+                btn.disabled = 'disabled'
+                var form = document.getElementById("send_form")
+                var req = "/sendBook"
+                var fdata = formToJson(form);
+                var ele = form[2]
+                if(ele.value == ''){
+                    error_msg.value = "读者ID不能为空"
+                    ele.style.border = "2px solid red"
+                    has_error.value = true;
+                    removeError(ele)
+                    btn.disabled = ''
+                    return
+                }
+                fdata['admin_ID'] = ID.value
+                console.log(fdata)
+                fetch(ip + req, {
+                    method: "post",
+                    headers: {'content-type': 'application/json'},
+                    body: JSON.stringify(fdata)
+                }).then(res=>res.text())
+                .then(res => {
+                    console.log(res)
+                    btn.disabled = ''
+                    if(res != '1'){
+                        error_msg.value = res  //返回错误信息
+                        has_error.value = true;
+                        document.onclick = ()=>{
+                            has_error.value = false;
+                            document.onclick=""
+                        }
+                    }
+                    else{
+                        if(send_search.value != '') search()
+                        else getSends()
+                        close(2)
+                        form.reset()
+                        showHint('借书成功')
+                    }
+                })
+            }
+
+            function send_btn(send){      //点击借书
+                var c = {}
+                var infos = ["name", "isbn"]
+                infos.forEach((info)=>{
+                    c[info] = send[info]
+                })
+                console.log(c)
+                var form = document.getElementById("send_form")
+                for(var i = 0; i < 2; i++){
+                    form[i].value = Object.values(c)[i]
+                }
+                send_book_show.value = true
+                showMask(1)
+            }
+
+            var pay_hint_show=ref(false), rt2={}
+
+            function return_btn(rt){      //点击还书
+                if(rt.penalty == 0){
+                    var req = "/returnBook"
+                    fetch(ip + req, {
+                        method: "post",
+                        headers: {'content-type': 'application/json'},
+                        body: JSON.stringify(rt)
+                    }).then(res=>{
+                        if(return_search.value != '') search()
+                        else getReturns()
+                        showHint('还书成功')
+                    }) 
+                }
+                else{
+                    hint_msg.value = "请支付罚金"
+                    pay_hint_show.value = true
+                    showMask(1)
+                    rt2 = Object.assign(rt)
+                }
+            }
+
+            function hasPay(){       //已支付
+                pay_hint_show.value = false
+                var req = "/returnBook"
+                fetch(ip + req, {
+                    method: "post",
+                    headers: {'content-type': 'application/json'},
+                    body: JSON.stringify(rt2)
+                }).then(res=>{
+                    if(return_search.value != '') search()
+                    else getReturns()
+                    showHint('还书成功')
+                })
+            }
+
+            function showHint(msg){     //显示提示信息
+                hint_msg.value = msg
+                hint_show.value = true
+                showMask(1)
+            }
+
+            function closeHint(){      //关闭提示信息
+                hint_show.value = false
+                showMask(0)
+                pay_hint_show.value = false
+            }
+
+            function showMask(c){       //显示遮罩（1-显示）
+                document.getElementById('mask_id').style.display = c == 1 ? 'block' : 'none'
+            }
+
+            function logout(){         //退出登录
+                window.open("login.html", "_self")
+            }
+
+            return {
+                uname, book_name, func_list_show, clickFunc, showCatelogs, showInfos, showReturns, showSends, closeInfo, openInfo, search, search_click,
+                catelogs, catelog_load, catelog_show, catelog_update, return_show, returns, return_load, return_update,
+                infos, info_load, info_show, info_update, ip, has_error, error_msg, is_mod_cate, logout, search_info,
+                send_load, sends, send_show, send_update, page_num, catelog_num, info_num, return_num, send_num, pageDown,
+                ID, uname, hint_show, hint_msg, showHint, closeHint, add_cate_btn, save_mod_cate, mod_cate_btn, del_mod_cate,
+                mod_info_btn, del_mod_info, send_btn, send_save_btn, send_book_show, return_btn, is_add, pay_hint_show, hasPay,
+                modify_title, is_modify, bname, author, publisher, isbn, time, transactor, cate_modify_show, modify_catelog, close
+            }
+        }
+    }).mount('.all')
+
+    // createApp({
+    //     data(){
+
+    //         return{
+    //             ID, uname, phone, mail
+    //         }
+    //     }
+    // }).mount('.all')
+</script>
+</html>

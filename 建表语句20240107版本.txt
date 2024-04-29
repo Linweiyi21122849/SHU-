@@ -1,0 +1,136 @@
+CREATE TABLE librarian (
+    librarian_id INT PRIMARY KEY,
+    name VARCHAR(50),
+    password VARCHAR(8) DEFAULT NULL
+);
+
+CREATE TABLE reader (
+    reader_id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(50),
+    phone VARCHAR(50),
+    email VARCHAR(50),
+    password VARCHAR(8) DEFAULT NULL
+);
+
+CREATE TABLE cip (
+    isbn VARCHAR(50) PRIMARY KEY,
+    title VARCHAR(50),
+    author VARCHAR(50),
+    publisher VARCHAR(50),
+    publish_date DATE,
+    copies INT,
+    librarian_id INT,
+    FOREIGN KEY (librarian_id) REFERENCES librarian(librarian_id)
+);
+
+CREATE TABLE book (
+    book_id VARCHAR(50) PRIMARY KEY,
+    isbn VARCHAR(50),
+    location VARCHAR(50),
+    status int,
+    librarian_id INT,
+    FOREIGN KEY (isbn) REFERENCES cip(isbn),
+    FOREIGN KEY (librarian_id) REFERENCES librarian(librarian_id)
+);
+
+CREATE TABLE borrow (
+    reader_id INT,
+    librarian_id INT,
+    book_id VARCHAR(50),
+    borrow_date DATE,
+    due_date DATE,
+    return_date DATE,
+    FOREIGN KEY (reader_id) REFERENCES reader(reader_id),
+    FOREIGN KEY (librarian_id) REFERENCES librarian(librarian_id),
+    FOREIGN KEY (book_id) REFERENCES book(book_id)
+);
+
+CREATE TABLE reserve (
+    reader_id INT,
+    isbn VARCHAR(50),
+    reserve_date DATE,
+    reserve_period INT,
+    PRIMARY KEY (reader_id, isbn),
+    FOREIGN KEY (reader_id) REFERENCES reader(reader_id),
+    FOREIGN KEY (isbn) REFERENCES cip(isbn)
+);
+
+INSERT INTO librarian (librarian_id, name, password)
+VALUES (1, '张三', '78945612'),
+  (2, '李四', '12348765'),
+  (3, '王五', '65432198'),
+  (4, '赵六', '87654321'),
+  (5, '陈七', '23456789'),
+  (6, '刘八', '98765432');
+
+
+INSERT INTO reader (name, phone, email, password)
+VALUES ('李明', '13812345678', 'liming@example.com', '12345678'),
+       ('刘晓明', '13987654321', 'liuxiaoming@example.com', '87654321'),
+       ('张颖', '13611112222', 'zhangying@example.com', '11112222'),
+       ('刘晶晶', '13722223333', 'liujingjing@example.com', '22223333'),
+       ('刘成刚', '13533334444', 'liuchenggang@example.com', '33334444'),
+       ('李二丽', '13844445555', 'lierli@example.com', '44445555'),
+       ('张晓峰', '13955556666', 'zhangxiaofeng@example.com', '55556666');
+
+INSERT INTO cip (isbn, title, author, publisher, publish_date, copies, librarian_id)
+VALUES ('978-3-16-148410-0', '数据库系统概论', '萧兴生', '清华大学出版社', '2022-01-15', 10, 1),
+       ('978-7-30-245987-6', '计算机网络', '秦丰羽', '人民邮电出版社', '2021-11-30', 5, 2),
+       ('978-7-03-063932-1', '算法导论', '郝学文', '机械工业出版社', '2022-03-10', 8, 1),
+       ('978-7-04-064783-2', '操作系统原理', '宋茂勋', '电子工业出版社', '2022-02-20', 6, 3),
+       ('978-7-03-065416-9', '软件工程', '叶志泽', '机械工业出版社', '2022-04-05', 4, 2),
+       ('978-7-04-067238-7', '数据结构与算法', '沈业', '电子工业出版社', '2022-03-25', 7, 1),
+       ('978-7-30-245986-9', '计算机组成原理', '郭修然', '人民邮电出版社', '2022-01-30', 3, 3),
+       ('978-3-16-123456-5', '数据库设计与管理', '张震岳', '清华大学出版社', '2023-05-01', 2, 2);
+        978-7-30-333333-6
+
+# 不外借：-1
+# 未借出：0
+# 已借出：1
+INSERT INTO book (book_id, isbn, location, status, librarian_id)
+VALUES
+    ('B001', '978-3-16-148410-0', '图书流通室', 0, 1),
+    ('B002', '978-3-16-148410-0', '图书流通室', 0, 1),
+    ('B003', '978-3-16-148410-0', '图书流通室', 0, 1),
+    ('B004', '978-3-16-148410-0', '图书流通室', 0, 1),
+    ('B005', '978-3-16-148410-0', '图书流通室', 0, 1),
+    ('B006', '978-3-16-148410-0', '图书阅览室', -1, 1),
+    ('B007', '978-3-16-148410-0', '图书阅览室', -1, 1),
+    ('B008', '978-3-16-148410-0', '图书阅览室', -1, 1),
+    ('B009', '978-3-16-148410-0', '图书阅览室', -1, 1),
+    ('B010', '978-3-16-148410-0', '图书阅览室', -1, 1),
+    ('B011', '978-7-03-063932-1', '图书流通室', 0, 2),
+    ('B012', '978-7-03-063932-1', '图书流通室', 0, 1),
+    ('B013', '978-7-03-063932-1', '图书流通室', 0, 1),
+    ('B014', '978-7-03-063932-1', '图书流通室', 0, 1),
+    ('B015', '978-7-03-063932-1', '图书阅览室', -1, 1),
+    ('B016', '978-7-03-063932-1', '图书阅览室', -1, 1),
+    ('B017', '978-7-03-063932-1', '图书阅览室', -1, 1),
+    ('B018', '978-7-03-063932-1', '图书阅览室', -1, 1),
+    ('B019', '978-7-03-065416-9', '图书阅览室', -1, 2),
+    ('B020', '978-7-03-065416-9', '图书阅览室', -1, 2),
+    ('B021', '978-7-03-065416-9', '图书阅览室', -1, 2),
+    ('B022', '978-7-03-065416-9', '图书阅览室', -1, 2),
+    ('B023', '978-7-04-064783-2', '图书流通室', 0, 3),
+    ('B024', '978-7-04-064783-2', '图书流通室', 0, 3),
+    ('B025', '978-7-04-064783-2', '图书流通室', 0, 3),
+    ('B026', '978-7-04-064783-2', '图书流通室', 0, 3),
+    ('B027', '978-7-04-064783-2', '图书流通室', 0, 3),
+    ('B028', '978-7-04-064783-2', '图书流通室', 0, 3),
+    ('B029', '978-7-04-067238-7', '图书流通室', 0, 1),
+    ('B030', '978-7-04-067238-7', '图书流通室', 0, 1),
+    ('B031', '978-7-04-067238-7', '图书流通室', 0, 1),
+    ('B032', '978-7-04-067238-7', '图书流通室', 0, 1),
+    ('B033', '978-7-04-067238-7', '图书阅览室', -1, 1),
+    ('B034', '978-7-04-067238-7', '图书阅览室', -1, 1),
+    ('B035', '978-7-04-067238-7', '图书阅览室', -1, 1),
+    ('B036', '978-7-30-245986-9', '图书阅览室', -1, 3),
+    ('B037', '978-7-30-245986-9', '图书阅览室', -1, 3),
+    ('B038', '978-7-30-245986-9', '图书阅览室', -1, 3),
+    ('B039', '978-7-30-245986-9', '图书阅览室', -1, 3),
+    ('B040', '978-7-30-245987-6', '图书流通室', 0, 2),
+    ('B041', '978-7-30-245987-6', '图书阅览室', -1, 2),
+    ('B042', '978-3-16-123456-5', '图书流通室', 0, 2),
+    ('B043', '978-3-16-123456-5', '图书流通室', 0, 2);
+
+

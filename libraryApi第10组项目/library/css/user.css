@@ -1,0 +1,406 @@
+#body{
+    background-size: cover;
+    background-repeat: no-repeat;
+    z-index: -1;
+}
+
+.frame_header{
+    width: 100%;
+    height: 60px;
+    /* border: 1px solid; */
+    position: relative;
+    background-color: rgb(20, 77, 168);
+    border-bottom: 5px solid rgb(57, 120, 222);
+    color: rgb(250, 250, 250);
+    z-index: 1;
+}
+
+.header_img{
+    top: -70px;
+    left: 110px;
+    width: 840px;
+    height: 140px;
+    position: absolute;
+    z-index: -1;
+}
+
+.header_left{
+    width: 120px;
+    float: left;
+    height: 60px;
+    margin-left: 20px;
+    line-height: 60px;
+    margin-bottom: 20px;
+    /* border: 1px solid; */
+    background-size: 85%; 
+    background-repeat: no-repeat;
+    background-position: 0px -10px;
+}
+
+.func {
+    width: 220px;
+    float: left;    
+    margin: 20px 0px 0px 60px;
+    padding-left: 0px;
+    position: relative;
+    /* border: 1px solid; */
+}
+
+.func li{
+    float: left;
+    width: 100%;
+    list-style: none;
+    /* cursor: pointer; */
+    /* border: 1px solid; */
+}
+
+.name_wrap{
+    width: fit-content;
+    margin: 0px auto;
+    cursor: pointer;
+    /* border: 1px solid; */
+}
+
+#uname{
+    display: inline-block;
+    max-height: 30px;
+    max-width: 200px;
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+    font-size: 20px;
+    margin: 0px 0px 0px 0px;
+    /* border: 1px solid; */
+}
+
+.img_arrow{
+    width: 20px;
+    /* margin-top: 5px; */
+}
+
+.func_component{
+    width: 100%;
+    border: 1px solid rgb(164, 192, 245);
+    padding-left: 0px;
+    float: left;
+    margin: 0px auto;
+    padding-bottom: 20px;
+    position: absolute;
+    border-radius: 10px;
+    background: linear-gradient(to bottom, rgb(151, 182, 240), rgb(40, 70, 150));
+}
+
+.func_component div{
+    text-align: center;
+    color: rgb(0, 0, 0);
+    margin-top: 20px;
+    cursor: pointer;
+    /* border: 1px solid; */
+}
+
+.func2{
+    float: left;
+    margin: 20px 0px 0px 0px;
+    padding-left: 0px;
+    /* border: 1px solid; */
+}
+
+.func2 li{
+    float: left;
+    list-style: none;
+    margin: -12px 0px 0px 80px;
+    font-size: 20px;
+    cursor: pointer;
+    padding: 10px 10px;
+    border-radius: 15px;
+    position: relative;
+    /* border: 1px solid; */
+}
+
+.light{
+    content: "";
+    border-radius: 15px;
+    box-shadow: 0 0 15px 6px rgb(2, 179, 255), inset 0 0 15px 6px rgb(2, 179, 255);
+    background: linear-gradient(to right, rgb(2, 179, 255), rgb(46, 107, 204),rgb(2, 179, 255));
+    background-size: 200%;
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0px;
+    left: 0px;
+    animation: shine 1.5s linear infinite;
+    z-index: -1;
+}
+
+@keyframes shine{
+    0%{
+        background-position: 0%;
+    }
+    100%{
+        background-position: -200%;
+    }
+}
+
+.btn{
+    /* height: 2px; */
+    font-size: 15px;
+    /* background-color: rgb(182, 212, 252); */
+    background-color: rgb(243, 224, 202);
+    border-radius: 5px;
+    border: 0px;
+    padding: 2px 6px;
+    color: #194684;
+    cursor: pointer;
+    display: inline-block;
+}
+
+.btn:hover{
+    background-color: rgb(196, 182, 165);
+}
+
+.table_img{
+    top: -80px;
+    left: 20px;
+    width: 1407px;
+    height: 736px;
+    position: absolute;
+    z-index: -2;
+}
+
+.table_wrap{
+    width: 1200px;
+    height: 580px;
+    margin: 80px auto;
+    border: 1px solid rgb(9,40,91);
+    /* border-radius: 15px; */
+    position: relative;
+    /* background: linear-gradient(to right, rgb(79,215,232), 5%,rgb(214, 243, 254) 20%, 95%,  rgb(79,215,232)); */
+    /* background: linear-gradient(to right, rgb(174, 202, 248), 5%,rgb(246, 249, 253) 20%, 95%,  rgb(174, 202, 248)); */
+    background: radial-gradient(at 50% 100%, rgb(68,133,225,0.5),rgb(67,88,199),53%,rgb(9,40,91) 80%);
+}
+
+ th{
+    border-bottom: 1px solid;
+    height: 30px;
+    font-size: 18px;
+    /* color: rgb(191, 215, 250); */
+    color: rgb(243, 224, 202);
+    /* width: 50px; */
+    /* padding: auto; */
+}
+
+ td{
+    height: 45px;
+    font-size: 16px;
+    /* color: rgb(191, 215, 250); */
+    color: rgb(243, 224, 202);
+    /* font-weight: bold; */
+    text-align: center;
+    /* border: 1px solid; */
+    text-overflow: ellipsis;
+    overflow: hidden;
+    white-space: nowrap;
+}
+
+ tr:hover{
+    background-color: rgba(82, 149, 255, 0.5)
+}
+
+.search_book{
+    width: 480px;
+    height: 35px;
+    text-align: center;
+    font-size: 20px;
+    /* line-height: 30px; */
+    margin: 20px auto;
+    margin-bottom: 40px;
+    display: block;
+    /* border: 1px solid; */
+}
+
+#search_input{
+    width: 400px;
+    height: 100%;
+    font-size: 16px;
+    outline: none;
+    padding-left: 10px;
+    line-height: 100%;
+    /* text-align: center; */
+    border: 1.5px solid rgb(56, 135, 238);
+    float: left;
+    background-color: rgb(177, 207, 255);
+    /* display: block; */
+}
+
+#search_btn{
+    width: 80px;
+    height: 100%;
+    font-size: 16px;
+    text-align: center;
+    border: 0px;
+    color: white;
+    /* background-color: rgb(92,157,241); */
+    background-color: rgb(56, 135, 238);
+    cursor: pointer;
+    /* display: block; */
+}
+
+#search_btn:hover{
+    background-color: rgb(52, 124, 219);
+}
+
+.info_wrap{
+    width: 600px;
+    height: fit-content;
+    top: 0; right: 0; bottom: 0; left: 0;
+    margin: auto;
+    transform: translate(0px, -35px);
+    border: 1px solid rgb(25, 81, 170);  
+    border-radius: 20px;
+    position: absolute;
+    padding-bottom: 40px;
+    /* background-color: rgb(167, 201, 253); */
+    background: radial-gradient(at 50% 100%, rgb(68,133,225),rgb(67,88,199),43%,rgb(9,40,91) 75%);;
+    display: none;
+    color: white;
+    /* float: left; */  
+    z-index: 2;
+}
+
+.info_close_wrap{
+    width: 100%;
+    height: 25px;
+}
+
+.info_close{
+    width: 25px;
+    height: 100%;
+    font-size: 22px;
+    float: right;
+    cursor: pointer;
+    line-height: 100%;
+    /* border: 1px solid; */
+}
+
+.info_row{
+    float: left;
+    width: 100%;
+    height: 35px;
+    margin-bottom: 25px;
+    /* border: 1px solid; */
+}
+
+
+.info_key{
+    width: 120px;
+    height: 100%;
+    float: left;
+    margin-left: 130px;
+    font-size: 18px;
+    line-height: 35px;
+    /* border: 1px solid; */
+}
+
+.info_value{
+    float: left;
+    height: 100%;
+    font-size: 16px;
+    outline: none;
+    padding-left: 10px;
+    line-height: 100%;
+    border: 0px solid;
+    border-radius: 8px;
+    background-color: rgb(205, 233, 255);
+}
+
+.hint_wrap{
+    width: 300px;
+    height: 100px;
+    top: 0; right: 0; bottom: 0; left: 0;
+    
+    margin: auto;
+    transform: translate(0px, -35px);
+    border: 1.5px solid rgb(59, 127, 237);
+    border-radius: 20px;
+    position: absolute;
+    padding-bottom: 40px;
+    /* background-color: rgb(199, 219, 251); */
+    background: radial-gradient(at 50% 100%, rgb(84, 134, 250),rgb(17, 65, 177));
+    /* background-color: rgb(63,85,191); */
+    /* display: none; */
+    /* float: left; */
+    z-index: 2;
+}
+
+.hint_word{
+    width: 100%;
+    font-size: 22px;
+    text-align: center;
+    margin-top: 30px;
+    color: rgb(255, 253, 205);
+    /* border: 1px solid; */
+}
+
+.hint_btn{
+    width: 60px;
+    height: 30px;
+    text-align: center;
+    /* margin-top: 30px; */
+    margin: 25px auto;
+    display: block;
+    padding: 0px 10px;
+    color: #123a71;
+    background-color: rgb(137, 185, 248);
+    cursor: pointer;
+    border-radius: 5px;
+    border: 0px;
+}
+
+.hint_btn:hover{
+    background-color: rgb(117, 158, 212);
+}
+
+.mask{
+    width: 100%;
+    height: 100%;
+    top: 0px;
+    left: 0px;
+    position: absolute;
+    background: rgba(41, 41, 41, 0.368);
+    display: none;
+}
+
+.page_wrap{
+    width: 100%;
+    bottom: 0px;
+    position: absolute;
+    /* border: 1px solid; */
+}
+
+.page_wrap ul{
+    display: block;
+    margin: 0px auto;
+    width: 180px;
+    height: 28px;
+    padding-left: 0px;
+    /* border: 1px solid; */
+}
+
+.page_wrap li{
+    width: 30px;
+    height: 100%;
+    border-radius: 5px;
+    display: inline-block;
+    font-size: 16px;
+    text-align: center;
+    line-height: 28px;
+    list-style: none;
+    background-color: rgb(163, 188, 253);
+    /* border: 1px solid; */
+    cursor: pointer;
+}
+
+.page_wrap li:hover{
+    background-color: rgb(143, 164, 219);
+}
+

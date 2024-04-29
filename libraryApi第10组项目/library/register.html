@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的图书馆 - 注册界面</title>
+    <link rel="icon" href="images/logo.png">
+    <link rel="stylesheet" href="css/register.css">
+    <script src="vue.global.js"></script>
+</head>
+
+<body id="body">
+    <div class="login" id="app">
+        <h2 class="login-title">{{ title }}</h2>
+        <div class="login-wrap">
+            <input type="text" class="login-input" id="user" placeholder="请输入用户名" v-model="user"><br>
+            <template v-if="mod == '1'">
+            <input type="text" class="login-input" id="work_num" placeholder="请输入工号" v-model="work_num" oninput="onlyNum(this)"><br>
+            </template>
+            <input type="password" class="login-input" id="password" placeholder="请输入密码（不少于6位）" v-model="pw" @blur="checkCodeLen"><br>
+            <input type="password" class="login-input" id="confirm_pw" placeholder="请再次输入密码" v-model="confirm_pw" @blur="checkCode"><br>
+            <template  v-if="mod == '0'">
+                <input type="text" class="login-input" id="phone" placeholder="请输入手机号" v-model="phone" oninput="onlyNum(this)"><br>
+                <input type="email" class="login-input" id="mail" placeholder="请输入邮箱" v-model="mail" oninput="disablec(this)"><br>
+            </template>
+        </div>
+        <div v-if="mod == '0'"> 
+            <input type="text" id="code" placeholder="请输入验证码" v-model="code" oninput="disablec(this)">
+            <input type="button" id="btn-code" :value=ver_code @click="sendVerCode"><br>
+        </div>
+        <div class="error" v-if="has_error">
+            {{error_msg}}
+        </div>
+        <button type="button" class="btn" id="btn-register" @click="checkError">注册</button>
+    </div>
+
+</body>
+
+<script>
+    var ip = "http://127.0.0.1:4444"
+    var mod = window.location.search.substr(5,1)
+    console.log("mod: " + mod)
+    const title = mod == "1" ? "管理员注册" : "用户注册"
+    
+    const { createApp, ref } = Vue
+
+    function disablec(v){          //禁止输入中文
+        v.value = v.value.replace(/[\u4e00-\u9fa5]/g, '')
+    }
+
+    function onlyNum(v){          //只能输入数字
+        v.value = v.value.replace(/[^\d]/g,'')
+    }
+
+    onload=()=>{
+        ele = document.getElementById("body")
+        ele.style.background = mod=='0' ? "radial-gradient(rgb(48, 253, 253),30%, rgb(236, 250, 250))" : "radial-gradient(rgb(236,28,36),30%, rgb(251, 227, 227))"
+        ele = document.getElementsByClassName("login")[0]
+        ele.style.background = mod=='0' ? "radial-gradient(rgb(235, 255, 255),60%, rgb(8, 250, 250) 69%)" : "radial-gradient(rgb(255, 211, 213),66%, rgb(252, 58, 64) 75%)"
+        ele.style.boxShadow = mod=='0' ? "0 0 15px 3px rgb(2, 179, 255), inset 0 0 15px 3px rgb(2, 179, 255)" : "0 0 15px 3px rgb(158, 1, 1), inset 0 0 20px 3px rgb(158, 1, 1)"
+        ele = document.getElementById("btn-register")
+        ele.style.backgroundColor = mod=='0' ? "rgb(77, 139, 200)" : "rgb(138, 47, 47)"
+    }
+
+    createApp({
+        data() {
+            var user=ref(''), pw=ref(''), confirm_pw=ref(''), ver_code=ref('发送验证码')
+            var phone=ref(''), mail=ref(''), code=ref('');
+            var error_msg=ref(''), has_error=ref(0), work_num=ref(''), ver_code_value=ref('')
+
+            function sendVerCode(){      //发送验证码
+                if(ver_code.value != '发送验证码') return
+                var req = '/sendVerCode'
+                fetch(ip + req, {
+                        method: "post",
+                        headers: {'content-type': 'application/json'},
+                        body: JSON.stringify({"mail": mail.value})
+                }).then(res=>res.text())
+                .then(res => {
+                    ver_code_value.value = res
+                    console.log(res)
+                })
+                ver_code.value = 5
+                var interval = setInterval(() => {
+                    ver_code.value -= 1
+                    if(ver_code.value == 0){
+                        clearInterval(interval)   //停止循环
+                        ver_code.value = '发送验证码'
+                    }
+                }, 1000);
+            }
+
+            function checkCodeLen(){    //检查密码长度
+                if(has_error.value == 1) return
+                if(pw.value.length < 6){
+                    error_msg.value = "密码长度不能小于6"
+                    var error_id = ref("password")
+                    var ele = document.getElementById(error_id.value)
+                    ele.style.border = "2px solid red"
+                    has_error.value = 1;
+                    ele.onfocus = function (){
+                        has_error.value = 0;
+                        ele.style.border = "1px solid black"
+                        ele.onfocus=""
+                    }
+                }
+            }
+
+            function checkCode(){       //检查确认密码
+                if(has_error.value == 1) return
+                if(pw.value != confirm_pw.value){
+                    error_msg.value = "两次密码不相同"
+                    var error_id = ref("confirm_pw")
+                    var ele = document.getElementById(error_id.value)
+                    ele.style.border = "2px solid red"
+                    has_error.value = 1;
+                    ele.onfocus = function (){
+                        has_error.value = 0;
+                        ele.style.border = "1px solid black"
+                        ele.onfocus=""
+                    }
+                }
+            }
+
+            function showError(error_id){      //显示错误
+                var ele = document.getElementById(error_id.value)
+                ele.style.border = "2px solid red"
+                has_error.value = 1;
+                ele.onfocus = ()=>{
+                    has_error.value = 0;
+                    ele.style.border = "1px solid black";
+                    ele.onfocus=""
+                }
+            }
+
+            function checkError(){            //检查错误
+                if(has_error.value == 1) return
+                btn = document.getElementById('btn-register')
+                btn.disabled = 'disabled'
+                var error_id=ref('')
+                if(user.value == ''){
+                    error_msg.value = "用户名不能为空"
+                    error_id.value = "user"
+                }
+                else if(work_num.value == '' && mod == '1'){
+                    error_msg.value = "工号不能为空"
+                    error_id.value = "work_num"
+                }
+                else if(pw.value == ''){
+                    error_msg.value = "密码不能为空"
+                    error_id.value = "password"
+                }
+                else if(confirm_pw.value == ''){
+                    error_msg.value = "请再次输入密码"
+                    error_id.value = "confirm_pw"
+                }
+                else if(phone.value == '' && mod == '0'){
+                    error_msg.value = "手机号不能为空"
+                    error_id.value = "phone"
+                }
+                else if(mail.value == '' && mod == '0'){
+                    error_msg.value = "邮箱不能为空"
+                    error_id.value = "mail"
+                }
+                else if(code.value == '' && mod == '0'){
+                    error_msg.value = "请输入验证码"
+                    error_id.value = "code"
+                }
+                else if(code.value != '' && mod == '0' && code.value != ver_code_value.value){
+                    error_msg.value = "验证码错误"
+                    error_id.value = "code"
+                }
+                if(error_id.value != ''){
+                    showError(error_id)
+                    btn.disabled = ''
+                }
+                else{
+                    var req = mod == "0" ? "/registerCheck0" : "/registerCheck1"
+                    var account = mod == "0" ? {"user": user.value, "phone": phone.value, "mail": mail.value, "code": pw.value}:
+                                                     {"user": user.value, "worknum": work_num.value ,"code": pw.value}
+                                                     
+                    fetch(ip + req, {
+                        method: "post",
+                        headers: {'content-type': 'application/json'},
+                        body: JSON.stringify(account)
+                    }).then(res=>res.text())
+                    .then(res => {
+                        btn.disabled = ''
+                        console.log("res: " + res)
+                        if(res == '1'){               //检查通过
+                            window.open("login.html", "_self")
+                        }
+                        else if(res == 'phoneRepeat'){   //手机号重复
+                            error_msg.value = "手机号已注册"
+                            error_id.value = "phone"
+                        }
+                        else if(res == 'mailRepeat'){   //邮箱重复
+                            error_msg.value = "邮箱已注册"
+                            error_id.value = "mail"
+                        }
+                        else if(res == 'workNumRepeat'){   //工号重复
+                            error_msg.value = "工号已注册"
+                            error_id.value = "work_num"
+                        }
+                        if(error_id.value != ''){
+                            showError(error_id)
+                        }
+                    })
+                }
+            }
+
+            return {
+                title, mod, user, pw, confirm_pw, phone, mail, code,
+                error_msg, has_error, checkError, checkCodeLen, checkCode,
+                work_num, ver_code, sendVerCode
+            }
+        }
+    }).mount('.login')
+</script>
+</html>

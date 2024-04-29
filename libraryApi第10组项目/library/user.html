@@ -1,0 +1,468 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>我的图书馆 - 用户界面</title>
+    <link rel="icon" href="images/logo.png">
+    <link rel="stylesheet" href="css/user.css">
+    <script src="vue.global.js"></script>
+</head>
+
+<body id="body" background="images/background.png" style="background-color: rgb(0, 0, 0);">
+    <div class="all" style="width: 100%; height: 100%;">
+        <div class="frame_header">
+            <!-- <img src="images/frame_header.png" alt="" class="header_img"> -->
+            <div class="header_left" style="background-image: url(images/header_logo.png);"></div>
+            <ul class="func">
+                <li>
+                    <div class="name_wrap" @click.stop="clickFunc">
+                        <span id="uname">欢迎您，{{uname}}</span>
+                        <img src="images/arrow.png" class="img_arrow" style="margin-bottom: 6px;">
+                    </div>
+                    <ul class="func_component" v-if="func_list_show">
+                        <li><div @click="openInfo">个人信息</div></li>
+                        <li><div @click="logout">退出登录</a></div></li>
+                    </ul>
+                </li>
+            </ul>
+            <ul class="func2">
+                <li id="catelog" @click="showCatelogs"><div class="light" v-show="catelog_show"></div>书目信息</li>
+                <li id="reserve" @click="showReserves"><div class="light" v-show="reserve_show"></div>我的预约</li>
+                <li id="send" @click="showSends"><div class="light" v-show="send_show"></div>我的借书</li>
+            </ul>
+        </div>
+        <div class="frame_body" style="position: relative; z-index: 0;">
+            <img src="images/table_wrap4.png" alt="" class="table_img">
+            <div class="table_wrap">
+                <div class="search_book">
+                    <input type="search" id="search_input" placeholder="请输入书名" v-model="book_name">
+                    <input type="button" id="search_btn" value="检索" @click="search_click">
+                </div>
+                <table class="data_table" cellspacing="0" align="center" v-show="catelog_show">
+                    <colgroup>
+                        <col width="150px"><col width="150px"><col width="150px"><col width="150px">
+                        <col width="150px"><col width="100px"><col width="100px"><col width="100px">
+                    </colgroup>
+                    <tr>
+                        <th>书名</th><th>作者</th><th>出版商</th><th>ISBN号</th><th>出版年月</th><th>册数</th><th>经办人</th><th></th>
+                    </tr>
+                    <tr v-for="catelog in catelogs" :key="catelog_update" v-if="catelog_load">
+                        <td style="max-width: 150px;">{{catelog.name}}</td>
+                        <td style="max-width: 150px;">{{catelog.author}}</td>
+                        <td style="max-width: 150px;">{{catelog.publisher}}</td>
+                        <td style="max-width: 150px;">{{catelog.isbn}}</td>
+                        <td style="max-width: 150px;">{{catelog.time}}</td>
+                        <td style="max-width: 100px;">{{catelog.num}}</td>
+                        <td style="max-width: 100px;">{{catelog.transactor}}</td>
+                        <td v-if="false"><div>{{catelog.reserved}}</div></td>
+                        <td v-show="catelog.reserved == 1"><div>已预约</div></td>
+                        <td v-show="catelog.num == 0 && catelog.reserved == 0"><input type="button" value="预约" class="btn" style="padding: 3px 8px;" @click="res_btn(catelog)"></td>
+                    </tr>
+                </table>
+                <table class="reserve_table" cellspacing="0" align="center" v-show="reserve_show">
+                    <colgroup>
+                        <col width="155px"><col width="155px"><col width="155px"><col width="155px">
+                        <col width="155px"><col width="155px"><col width="120px">
+                    </colgroup>
+                    <tr>
+                        <th>书名</th><th>作者</th><th>出版商</th><th>ISBN号</th><th>预约日期</th><th>预约期限</th><th></th>
+                    </tr>
+                    <tr v-for="reserve in reserves" :key="reserve_update" v-if="reserve_load">
+                        <td style="max-width: 155px;">{{reserve.name}}</td>
+                        <td style="max-width: 155px;">{{reserve.author}}</td>
+                        <td style="max-width: 155px;">{{reserve.publisher}}</td>
+                        <td style="max-width: 155px;">{{reserve.isbn}}</td>
+                        <td style="max-width: 155px;">{{reserve.time}}</td>
+                        <td style="max-width: 155px;">{{reserve.ddl}}</td>
+                        <td><input type="button" value="取消预约" class="btn" @click="cancel_btn(reserve)"></td>
+                    </tr>
+                </table>
+                <table class="send_table" cellspacing="0" align="center" v-show="send_show">
+                    <colgroup>
+                        <col width="175px"><col width="175px"><col width="175px"><col width="175px">
+                        <col width="175px"><col width="175px">
+                    </colgroup>
+                    <tr>
+                        <th>书名</th><th>作者</th><th>出版商</th><th>ISBN号</th><th>借书日期</th><th>借书期限</th>
+                    </tr>
+                    <tr v-for="send in sends" :key="send_update" v-if="send_load">
+                        <td style="max-width: 175px;">{{send.name}}</td>
+                        <td style="max-width: 175px;">{{send.author}}</td>
+                        <td style="max-width: 175px;">{{send.publisher}}</td>
+                        <td style="max-width: 175px;">{{send.isbn}}</td>
+                        <td style="max-width: 175px;">{{send.time}}</td>
+                        <td style="max-width: 175px;">{{send.ddl}}</td>
+                    </tr>
+                </table>
+                <div class="page_wrap">
+                    <ul>
+                        <li style="float: left;" @click="pageDown(1)"><</li>
+                        <li style="margin-left: 45px; font-size: 14px;">{{page_num}}</li>
+                        <li style="float: right;" @click="pageDown(-1)">></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+        <div class="info_wrap" id="info_id">
+            <div class="info_close_wrap">
+                <div class="info_close" @click="closeInfo">×</div>
+            </div>
+            <h2 style="text-align: center; margin-bottom: 40px;">个人信息</h2>
+            <div class="info_row">
+                <div class="info_key">我的ID</div>
+                <input type="search" class="info_value" id="ID" v-model="ID" readonly="readonly">
+            </div>
+            <div class="info_row">
+                <div class="info_key">我的名字</div>
+                <input type="search" class="info_value" id="name" v-model="uname" readonly="readonly">
+            </div>
+            <div class="info_row">
+                <div class="info_key">我的手机号</div>
+                <input type="search" class="info_value" id="phone" v-model="phone" readonly="readonly" oninput="onlyNum(this)">
+            </div>
+            <div class="info_row">
+                <div class="info_key">我的邮箱</div>
+                <input type="search" class="info_value" id="mail" v-model="mail" readonly="readonly" oninput="disablec(this)">
+            </div>
+        </div>
+        <div class="hint_wrap" v-if="hint_show">
+            <div class="hint_word">{{hint_msg}}</div>
+            <input type="button" class="hint_btn" value="确认" @click="closeHint">
+        </div>
+    </div>
+    <div class="mask" id="mask_id"></div>
+</body>
+
+<script setup>
+    const { createApp, ref } = Vue
+    // const dayjs = require('dayjs')
+
+    var ip = "http://127.0.0.1:4444"
+    var uname= ref("123")
+    var ID=ref(''), phone=ref(''), mail=ref('')
+    var post, t = new Date()
+
+    createApp({
+        data() {
+            var book_name=ref('')
+            var func_list_show=ref(0)
+
+            function logout(){         //退出登录
+                window.open("login.html", "_self")
+            }
+
+            function closeInfo(){      //关闭个人信息
+                var info = document.getElementById('info_id')
+                info.style.display = "none"
+                showMask(0)
+            }
+
+            function openInfo(){       //开启个人信息
+                var info = document.getElementById('info_id')
+                info.style.display = "block"
+                showMask(1)
+            }
+
+            function clickFunc(){        //点击功能栏
+                func_list_show.value = 1
+                document.onclick=(e)=>{
+                    var ele = document.getElementsByClassName("func")
+                    if(ele[0].className != e.target.className){
+                        func_list_show.value = 0
+                        document.onclick=""
+                    }
+                }
+            }
+
+            var catelogs = [], reserves = [], sends = []
+            var catelog_load = ref(false), catelog_show = ref(true), catelog_update = ref(0)
+            var reserve_load = ref(false), reserve_show = ref(false), reserve_update = ref(0)
+            var send_load = ref(false), send_show = ref(false), send_update = ref(0)
+            var page_num=ref(1), catelog_num=ref(1), reserve_num=ref(1), send_num=ref(1)
+            var catelog_search=ref(''), reserve_search=ref(''), send_search=ref('')
+            var max_page_num=ref(3), max_catelog_num=ref(1), max_reserve_num=ref(2), max_send_num=ref(3)
+
+            function search_click(){   //点击检索
+                page_num.value = 1
+                if(catelog_show.value) {
+                    catelog_num.value = 1
+                    catelog_search.value = book_name.value
+                    if(book_name.value == '') {
+                        getBookCatelogs()
+                        return
+                    }
+                }
+                else if(reserve_show.value) {
+                    reserve_num.value = 1
+                    reserve_search.value = book_name.value 
+                    if(book_name.value == '') {
+                        getReserves()
+                        return
+                    }
+                }
+                else if(send_show.value) {
+                    send_num.value = 1
+                    send_search.value = book_name.value
+                    if(book_name.value == '') {
+                        getSends()
+                        return
+                    }
+                }
+                search()
+            }
+
+            function updateInfo(load){    //更新表中信息
+                load.value = false
+                load.value = true
+            }
+
+            function search(){      //检索
+                var req
+                if(catelog_show.value) {
+                    req = "/searchUserCatelog"
+                }
+                else if(reserve_show.value) {
+                    console.log("reserve检索")
+                    req = "/searchUserReserve"                 
+                }
+                else if(send_show.value) {
+                    req = "/searchUserSend"
+                }
+                fetch(ip + req, {
+                    method: "post",
+                    headers: {'content-type': 'application/json'},
+                    body: JSON.stringify({"ID": ID.value, "name": book_name.value, "pageNum": page_num.value})
+                }).then(res=>res.json())
+                .then(res => {
+                    console.log(res)
+                    if(catelog_show.value){
+                        catelogs.splice(0, catelogs.length)
+                        max_catelog_num.value = res[0].max
+                        for(var i = 1; i< res.length;i++){
+                            catelogs.push(res[i])
+                        }
+                        updateInfo(catelog_load)
+                    }
+                    else if(reserve_show.value){
+                        max_reserve_num.value = res[0].max
+                        reserves.splice(0, reserves.length)
+                        for(var i = 1; i< res.length;i++){
+                            reserves.push(res[i])
+                        }
+                        updateInfo(reserve_load)
+                    }
+                    else if(send_show.value){
+                        max_send_num.value = res[0].max
+                        sends.splice(0, sends.length)
+                        for(var i = 1; i< res.length;i++){
+                            sends.push(res[i])
+                        }
+                        updateInfo(send_load)
+                    }
+                })
+            }
+
+            function getUserInfo(){         //保存用户信息
+                phone.value = sessionStorage.getItem('phone')
+                console.log("phone: "+phone.value)
+                var req = "/userInfo"
+                fetch(ip + req, {
+                    method: "post",
+                    headers: {'content-type': 'application/json'},
+                    body: JSON.stringify({"phone": phone.value})
+                }).then(res=>res.json())
+                .then(res => {
+                    console.log(res)
+                    ID.value = res.ID
+                    uname.value  = res.name
+                    phone.value  = res.phone
+                    mail.value  = res.mail
+                })
+            }
+
+            function getBookCatelogs(){         //渲染书目信息
+                var req = "/userCatelogInfo"
+                fetch(ip + req,  {
+                    method: "post",
+                    headers: {'content-type': 'application/json'},
+                    body: JSON.stringify({"ID": ID.value, "pageNum": page_num.value})
+                }).then(res=>res.json())
+                .then(res => {
+                    console.log(res)
+                    max_catelog_num.value = res[0].max
+                    catelogs.splice(0, catelogs.length)
+                    for(var i = 1; i< res.length;i++){
+                        catelogs.push(res[i])
+                    }
+                    updateInfo(catelog_load)
+                })
+            }
+
+            function getReserves(){     //渲染预约信息
+                var req = "/userReserveInfo"
+                fetch(ip + req,  {
+                    method: "post",
+                    headers: {'content-type': 'application/json'},
+                    body: JSON.stringify({"ID": ID.value, "pageNum": page_num.value})
+                }).then(res=>res.json())
+                .then(res => {
+                    console.log(res)
+                    max_reserve_num.value = res[0].max
+                    reserves.splice(0, reserves.length)
+                    for(var i = 1; i< res.length;i++){
+                        reserves.push(res[i])
+                    }
+                    updateInfo(reserve_load)
+                    window.onload = ""
+                })
+            }
+
+            function getSends(){     //渲染借书信息
+                var req = "/userSendInfo"
+                fetch(ip + req, {
+                    method: "post",
+                    headers: {'content-type': 'application/json'},
+                    body: JSON.stringify({"ID": ID.value, "pageNum": page_num.value})
+                }).then(res=>res.json())
+                .then(res => {
+                    console.log(res)
+                    max_send_num.value = res[0].max
+                    sends.splice(0, sends.length)
+                    for(var i = 1; i< res.length;i++){
+                        sends.push(res[i])
+                    }
+                    updateInfo(send_load)
+                    window.onload = ""
+                })
+            }
+
+            getUserInfo();
+            
+            window.onload=()=>{
+                // while(ID.value == '');
+                console.log(ID.value)
+                getBookCatelogs()
+                getReserves()
+                getSends()
+            }
+
+            function showReserves(){    //显示预约信息
+                reserve_show.value = true
+                catelog_show.value = false
+                send_show.value = false
+                page_num.value = reserve_num.value
+                book_name.value = reserve_search.value
+                if(reserve_search.value != '') search()
+                else getReserves()
+                // getReserves()
+            }
+
+            function showCatelogs(){    //显示书目信息
+                catelog_show.value = true
+                reserve_show.value = false
+                send_show.value = false
+                page_num.value = catelog_num.value
+                book_name.value = catelog_search.value
+                if(catelog_search.value != '') search()
+                else getBookCatelogs()
+                // getBookCatelogs()
+            }
+
+            function showSends(){      //显示借书信息
+                send_show.value = true
+                catelog_show.value = false
+                reserve_show.value = false
+                page_num.value = send_num.value
+                book_name.value = send_search.value
+                if(send_search.value != '') search()
+                else getSends()
+                // getSends()
+            }
+
+            function pageDown(num){     //1-向前翻页; -1-向后翻页
+                if(catelog_show.value) {
+                    max_page_num.value = max_catelog_num.value
+                }
+                else if(reserve_show.value) {
+                    max_page_num.value = max_reserve_num.value
+                }
+                else if(send_show.value) {
+                    max_page_num.value = max_send_num.value
+                }
+                console.log(max_page_num.value)
+                if((page_num.value == 1 && num == 1) || (page_num.value == max_page_num.value && num == -1)) {
+                    showHint('没有更多了')
+                    return
+                }
+                page_num.value -= num
+                if(catelog_show.value) {
+                    if(catelog_search.value != '') search()
+                    else getBookCatelogs()
+                    catelog_num.value -= num
+                }
+                else if(reserve_show.value) {
+                    if(reserve_search_.value != '') search()
+                    else getReserves()
+                    reserve_num.value -= num
+                }
+                else if(send_show.value) {
+                    if(send_search.value != '') search()
+                    else getSends()
+                    send_num.value -= num
+                }
+            }
+
+            var hint_show = ref(false), hint_msg = ref(''), mask_show = ref(false)
+
+            function res_btn(catelog){  //点击预约
+                var req = "/userReserve"
+                fetch(ip + req, {
+                    method: "post",
+                    headers: {'content-type': 'application/json'},
+                    body: JSON.stringify({"ID": ID.value, "isbn": catelog.isbn})
+                })
+                catelog.reserved = "1"
+                showHint('预约成功')
+            }
+
+            function cancel_btn(reserve){  //取消预约
+                var req = "/cancelReserve"
+                fetch(ip + req, {
+                    method: "post",
+                    headers: {'content-type': 'application/json'},
+                    body: JSON.stringify({"ID": ID.value, "isbn": reserve.isbn})
+                }).then(res=>{
+                    showHint('取消成功')
+                    if(reserve_search.value == '') getReserves()
+                    else search()
+                })
+            }
+
+            function showHint(msg){     //显示提示信息
+                hint_msg.value = msg
+                hint_show.value = true
+                showMask(1)
+            }
+
+            function closeHint(){      //关闭提示信息
+                hint_show.value = false
+                showMask(0)
+            }
+
+            function showMask(c){       //显示遮罩（1-显示）
+                document.getElementById('mask_id').style.display = c == 1 ? 'block' : 'none'
+            }
+
+
+            return {
+                uname, book_name, func_list_show, clickFunc, showCatelogs, showReserves, showSends, closeInfo, openInfo, search, search_click,
+                catelogs, catelog_load, catelog_show, catelog_update, reserve_show, reserves, reserve_load, reserve_update,
+                send_load, sends, send_show, send_update, page_num, catelog_num, reserve_num, send_num, pageDown,
+                ID, uname, phone, mail, hint_show, hint_msg, showHint, closeHint, res_btn, cancel_btn, logout
+            }
+        }
+    }).mount('.all')
+
+</script>
+</html>
